@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Política de privacidad de CampusFlow: qué datos guarda la app en tu Mac, qué se envía al usar el asistente de IA y qué no se recopila.">
+<title>Política de privacidad — CampusFlow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#fbfaf7;color:#191527;font-family:'Manrope',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.7;font-size:16px}
+  ::selection{background:#7c5cff;color:#fff}
+  header,main,footer{max-width:760px;margin:0 auto;padding-left:24px;padding-right:24px}
+  header{padding-top:32px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px}
+  .brand i{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#7c5cff,#3b82f6);display:block}
+  .back{font-size:14px;font-weight:600;color:#574f63;text-decoration:none}
+  .back:hover,.back:focus-visible{color:#191527;text-decoration:underline}
+  h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(32px,6vw,46px);letter-spacing:-1px;line-height:1.1;margin:48px 0 8px}
+  h2{font-family:'Space Grotesk',sans-serif;font-size:22px;margin:44px 0 10px}
+  p,li{color:#3b3548}
+  ul{padding-left:22px;margin:10px 0}
+  li{margin:6px 0}
+  a{color:#5b3fe0}
+  code{background:rgba(25,21,39,.07);padding:2px 6px;border-radius:6px;font-size:.92em;word-break:break-all}
+  .meta{color:#8b8398;font-weight:600;font-size:14px;margin:0 0 28px}
+  .box{background:#fff;border:1px solid rgba(25,21,39,.1);border-radius:18px;padding:20px 24px;margin:24px 0;box-shadow:0 10px 30px -18px rgba(25,21,39,.25)}
+  .box p{margin:6px 0}
+  footer{border-top:1px solid rgba(25,21,39,.08);margin-top:64px;padding-top:28px;padding-bottom:40px;font-size:14px;color:#8b8398;font-weight:600}
+  a:focus-visible{outline:3px solid #7c5cff;outline-offset:3px;border-radius:4px}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="brand" href="index.html" aria-label="CampusFlow, ir al inicio"><i></i>CampusFlow</a>
+  <a class="back" href="index.html">← Volver al inicio</a>
+</header>
+
+<main>
+  <h1>Política de privacidad</h1>
+  <p class="meta">Última actualización: 10 de octubre de 2026 · Aplica a CampusFlow 1.0 para macOS y a este sitio web</p>
+
+  <div class="box">
+    <p><strong>En pocas palabras:</strong> CampusFlow guarda tus datos académicos únicamente en tu Mac. No tiene cuentas, no tiene publicidad ni analíticas, y no recibimos tu información. La única vez que algo sale de tu computadora es cuando <em>tú</em> usas el asistente de IA o la corrección de notas, que envían texto a Groq con tu propia clave.</p>
+  </div>
+
+  <h2>1. Qué datos guarda la app en tu Mac</h2>
+  <p>Todo lo que capturas (materias, tareas, horario, calificaciones, notas y tu nombre) se guarda en una base de datos local, en esta carpeta de tu usuario:</p>
+  <p><code>~/Library/Application Support/CampusFlow</code></p>
+  <ul>
+    <li><strong>Respaldos:</strong> la app crea un respaldo automático al día (conserva los 10 más recientes) y puedes crear otros manualmente. Se guardan en la subcarpeta <code>backups</code> y contienen tus mismos datos.</li>
+    <li><strong>Tu clave de Groq</strong>, si decides usar la IA, se guarda en el Llavero de macOS, no en la base de datos ni en los respaldos.</li>
+    <li>Las notificaciones de tareas y clases las genera tu propio Mac; no pasan por ningún servidor.</li>
+  </ul>
+  <p>Nosotros no tenemos acceso a esta información: nunca sale de tu computadora a menos que tú la copies o compartas.</p>
+
+  <h2>2. Asistente de IA y corrección de notas (opcional)</h2>
+  <p>Estas dos funciones solo se activan si pegas tu propia clave de la API de <a href="https://groq.com" rel="noopener">Groq</a> en Configuración. Si no lo haces, no se envía nada a ningún servicio.</p>
+  <p>Cuando las usas, la app envía directamente desde tu Mac a Groq, usando tu clave:</p>
+  <ul>
+    <li><strong>Asistente (chat):</strong> las instrucciones fijas del asistente y los últimos mensajes de la conversación en curso (hasta 20). El historial del chat vive solo en memoria y se pierde al cerrar la app.</li>
+    <li><strong>Corrección gramatical:</strong> el texto de la nota que pides corregir.</li>
+  </ul>
+  <p>No se envían tus materias, tareas, calificaciones, horario, nombre ni el resto de tus notas, salvo que tú lo escribas en el chat o en la nota que corriges. <strong>Evita escribir información sensible</strong> (contraseñas, datos de identidad, información médica) en estas funciones.</p>
+  <p>Groq es un tercero independiente: el tratamiento que da al texto que recibe (incluido cuánto tiempo lo conserva) lo rigen sus propias condiciones, no esta política. Consulta su <a href="https://groq.com/privacy-policy" rel="noopener">política de privacidad</a> y los términos de tu cuenta de Groq antes de usar la IA. La clave es tuya y la cuenta de Groq también; nosotros no la vemos.</p>
+
+  <h2>3. Qué no hacemos</h2>
+  <ul>
+    <li>No hay cuentas, registro ni inicio de sesión.</li>
+    <li>No incluimos analíticas, telemetría, rastreadores ni publicidad en la app.</li>
+    <li>No vendemos ni compartimos datos, porque no los recibimos.</li>
+    <li>La app no se conecta a internet por su cuenta, salvo para las funciones de IA que activas tú.</li>
+  </ul>
+
+  <h2>4. Este sitio web y las descargas</h2>
+  <ul>
+    <li>Las tipografías del sitio (Space Grotesk y Manrope) se cargan desde Google Fonts, por lo que Google puede recibir tu dirección IP al visitar la página.</li>
+    <li>El sitio y los instaladores se alojan en GitHub, que puede registrar datos técnicos de la visita o la descarga (como la IP) según su propia política.</li>
+    <li>Nosotros no usamos cookies ni herramientas de analítica en el sitio.</li>
+  </ul>
+
+  <h2>5. Cómo borrar tus datos</h2>
+  <p>Como los datos están en tu Mac, tú los controlas por completo:</p>
+  <ul>
+    <li><strong>Borrar la clave de Groq:</strong> vacía el campo en Configuración, o elimina el elemento «CampusFlow» en la app Acceso a Llaveros.</li>
+    <li><strong>Borrar todo lo demás:</strong> elimina la carpeta <code>~/Library/Application Support/CampusFlow</code> (incluye la base de datos y los respaldos) y arrastra CampusFlow a la Papelera.</li>
+    <li><strong>Datos enviados a Groq:</strong> para consultarlos o pedir su eliminación, dirígete a Groq con tu cuenta.</li>
+  </ul>
+
+  <h2>6. Cambios a esta política</h2>
+  <p>Si CampusFlow cambia la forma en que trata los datos, actualizaremos esta página y la fecha de arriba. Los cambios importantes se anunciarán en la página de descargas.</p>
+
+  <h2>7. Contacto</h2>
+  <p>Para cualquier duda sobre privacidad, escribe a <a href="mailto:avendanojosemaria9@gmail.com">avendanojosemaria9@gmail.com</a>.</p>
+</main>
+
+<footer>Hecho para estudiantes · © 2026 CampusFlow</footer>
+
+</body>
+</html>

@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="CampusFlow: organiza tu semestre en una sola app de escritorio para macOS. Materias, tareas, horario, calificaciones, notas y un asistente con IA para estudiantes.">
+<title>CampusFlow — Tu semestre, organizado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:#fbfaf7;color:#191527;font-family:'Manrope',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  ::selection{background:#7c5cff;color:#fff}
+  @keyframes cf-marq{to{transform:translateX(-50%)}}
+  .cf-rev{opacity:0;transform:translateY(34px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1)}
+  .cf-rev.cf-in{opacity:1;transform:none}
+  .cf-link{position:relative}
+  .cf-link::after{content:'';position:absolute;left:0;bottom:-3px;height:2px;width:0;background:#191527;transition:width .3s ease}
+  .cf-link:hover::after{width:100%}
+  .cf-btn{transition:transform .25s cubic-bezier(.16,1,.3,1),box-shadow .25s,background .25s}
+  .cf-btn:hover{transform:translateY(-3px)}
+  .cf-feat{transition:transform .4s cubic-bezier(.16,1,.3,1),box-shadow .4s,border-color .4s}
+  .cf-feat:hover{transform:translateY(-8px)}
+  .cf-chip{transition:transform .3s,box-shadow .3s}
+  .cf-chip:hover{transform:translateY(-4px) rotate(-2deg)}
+  .cf-step:hover .cf-stepnum{transform:scale(1.12) rotate(-6deg)}
+  .cf-stepnum{transition:transform .4s cubic-bezier(.16,1,.3,1)}
+
+  /* ---- Responsive ---- */
+  @media (max-width: 900px) {
+    header { padding: 130px 24px 40px !important; }
+    #features { padding: 60px 24px !important; }
+    #features > div:last-child { grid-template-columns: repeat(2, 1fr) !important; }
+    #how { padding: 70px 24px !important; }
+    #how > div > div:last-child { grid-template-columns: repeat(2, 1fr) !important; }
+    section#download { padding: 70px 24px !important; }
+    .cf-feat[style*="span 2"] { grid-column: span 2 !important; }
+    header h1 { font-size: clamp(34px, 8vw, 74px) !important; letter-spacing: -1.5px !important; }
+    #features h2, #how h2, section#download h2 { font-size: clamp(30px, 6vw, 52px) !important; }
+  }
+  @media (max-width: 600px) {
+    nav { padding: 14px 20px !important; }
+    nav > div:last-child > a.cf-link { display: none !important; }
+    header { padding: 116px 18px 30px !important; }
+    #features > div:last-child { grid-template-columns: 1fr !important; }
+    #how > div > div:last-child { grid-template-columns: 1fr !important; }
+    .cf-feat, .cf-feat[style*="span 2"] { grid-column: span 1 !important; }
+    /* el mockup del dashboard: permitir scroll horizontal en vez de desbordar */
+    #cf-win > div:last-child { overflow-x: auto !important; }
+    /* botones a ancho completo y apilados */
+    header .cf-btn, section#download .cf-btn, section#download .cf-soon { width: 100% !important; text-align: center !important; }
+  }
+
+  /* ---- Accesibilidad ---- */
+  a:focus-visible, button:focus-visible, .cf-btn:focus-visible {
+    outline: 3px solid #7c5cff;
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+  /* El texto #8b8398 sobre blanco queda por debajo del contraste comodo;
+     se oscurece globalmente para legibilidad sin cambiar la identidad. */
+  [style*="color:#8b8398"] { color: #6b6478 !important; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+    .cf-rev { opacity: 1 !important; transform: none !important; }
+    #cf-win { transform: none !important; }
+    #cf-blob { transform: translate(-50%, 0) !important; }
+  }
+</style>
+</head>
+<body>
+<main style="position:relative">
+
+<!-- NAV -->
+<nav aria-label="Navegación principal" style="position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:18px 40px;backdrop-filter:blur(14px);background:rgba(251,250,247,.72);border-bottom:1px solid rgba(25,21,39,.06)">
+  <div style="display:flex;align-items:center;gap:11px">
+    <div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#7c5cff,#3b82f6);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(124,92,255,.4)">
+      <div style="width:14px;height:14px;border:3px solid #fff;border-radius:50%;border-right-color:transparent;border-bottom-color:transparent;transform:rotate(45deg)"></div>
+    </div>
+    <span style="font-family:'Space Grotesk';font-weight:700;font-size:20px;letter-spacing:-.5px">CampusFlow</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:34px;font-size:15px;font-weight:600">
+    <a href="#features" class="cf-link" style="color:#191527;text-decoration:none">Funciones</a>
+    <a href="#how" class="cf-link" style="color:#191527;text-decoration:none">Cómo funciona</a>
+    <a href="#download" class="cf-btn" style="text-decoration:none;color:#fff;background:#191527;padding:11px 22px;border-radius:99px;box-shadow:0 8px 24px rgba(25,21,39,.18)">Descargar gratis</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header style="position:relative;padding:160px 40px 60px;max-width:1280px;margin:0 auto;overflow:hidden">
+  <div id="cf-blob" style="position:absolute;top:60px;left:50%;width:680px;height:680px;border-radius:50%;background:radial-gradient(circle,rgba(124,92,255,.32),rgba(59,130,246,.18) 40%,transparent 68%);filter:blur(20px);transform:translate(-50%,0);pointer-events:none;z-index:0"></div>
+  <div style="position:relative;z-index:1;text-align:center;max-width:920px;margin:0 auto">
+    <div class="cf-rev" style="display:inline-flex;align-items:center;gap:9px;padding:8px 16px;border-radius:99px;background:#fff;border:1px solid rgba(25,21,39,.08);box-shadow:0 6px 20px rgba(25,21,39,.05);font-size:13px;font-weight:700;margin-bottom:28px">
+      <span style="width:8px;height:8px;border-radius:50%;background:#1fb6a6;box-shadow:0 0 0 4px rgba(31,182,166,.18)"></span>
+      Tu semestre, por fin en un solo lugar
+    </div>
+    <h1 class="cf-rev" style="font-family:'Space Grotesk';font-weight:700;font-size:74px;line-height:1.02;letter-spacing:-2.5px;margin:0 0 24px">
+      Deja de saltar entre<br>apps. Organiza tu<br>
+      <span style="position:relative;white-space:nowrap">semestre
+        <span style="position:absolute;left:0;right:0;bottom:6px;height:16px;background:linear-gradient(90deg,#7c5cff,#ff6b5e,#ffb020);border-radius:99px;z-index:-1;opacity:.85"></span>
+      </span> con flow.
+    </h1>
+    <p class="cf-rev" style="font-size:20px;line-height:1.55;color:#574f63;max-width:600px;margin:0 auto 38px;font-weight:500">
+      Materias, tareas, horarios y calificaciones — centralizados en una app de escritorio rápida y hermosa, hecha para estudiantes.
+    </p>
+    <div class="cf-rev" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+      <a href="#download" class="cf-btn" style="text-decoration:none;color:#fff;background:linear-gradient(135deg,#7c5cff,#3b82f6);padding:16px 30px;border-radius:14px;font-weight:700;font-size:16px;box-shadow:0 14px 34px rgba(124,92,255,.4)">Descargar para escritorio</a>
+      <a href="#how" class="cf-btn" style="text-decoration:none;color:#191527;background:#fff;border:1px solid rgba(25,21,39,.1);padding:16px 28px;border-radius:14px;font-weight:700;font-size:16px;box-shadow:0 8px 22px rgba(25,21,39,.06)">Ver cómo funciona</a>
+    </div>
+  </div>
+
+  <!-- APP WINDOW MOCKUP -->
+  <div id="cf-tilt" class="cf-rev" aria-hidden="true" style="position:relative;z-index:1;margin:64px auto 0;max-width:1060px;transform-style:preserve-3d;perspective:1600px">
+    <div id="cf-win" style="border-radius:18px;overflow:hidden;background:#fff;box-shadow:0 40px 90px -20px rgba(25,21,39,.35),0 0 0 1px rgba(25,21,39,.05);transition:transform .15s ease-out">
+      <!-- titlebar -->
+      <div style="display:flex;align-items:center;gap:8px;padding:13px 18px;background:#f3f1ee;border-bottom:1px solid rgba(25,21,39,.06)">
+        <span style="width:12px;height:12px;border-radius:50%;background:#ff6b5e"></span>
+        <span style="width:12px;height:12px;border-radius:50%;background:#ffb020"></span>
+        <span style="width:12px;height:12px;border-radius:50%;background:#1fb6a6"></span>
+        <span style="margin-left:14px;font-size:12px;font-weight:700;color:#8b8398;font-family:'Space Grotesk'">CampusFlow — Dashboard</span>
+      </div>
+      <div style="display:flex;min-height:430px">
+        <!-- sidebar -->
+        <div style="width:208px;background:#191527;padding:22px 14px;color:#fff;flex-shrink:0">
+          <div style="display:flex;align-items:center;gap:9px;padding:0 8px 22px">
+            <div style="width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#7c5cff,#3b82f6)"></div>
+            <span style="font-family:'Space Grotesk';font-weight:700;font-size:15px">CampusFlow</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:10px;margin-bottom:3px;font-size:13.5px;font-weight:600;background:linear-gradient(135deg,#7c5cff,#3b82f6);color:#fff">
+            <span style="width:8px;height:8px;border-radius:3px;background:#fff"></span>Dashboard
+          </div>
+          <div style="display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:10px;margin-bottom:3px;font-size:13.5px;font-weight:600;background:transparent;color:#b9b2c7">
+            <span style="width:8px;height:8px;border-radius:3px;background:#ff6b5e"></span>Materias
+          </div>
+          <div style="display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:10px;margin-bottom:3px;font-size:13.5px;font-weight:600;background:transparent;color:#b9b2c7">
+            <span style="width:8px;height:8px;border-radius:3px;background:#ffb020"></span>Tareas
+          </div>
+          <div style="display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:10px;margin-bottom:3px;font-size:13.5px;font-weight:600;background:transparent;color:#b9b2c7">
+            <span style="width:8px;height:8px;border-radius:3px;background:#1fb6a6"></span>Horario
+          </div>
+          <div style="display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:10px;margin-bottom:3px;font-size:13.5px;font-weight:600;background:transparent;color:#b9b2c7">
+            <span style="width:8px;height:8px;border-radius:3px;background:#3b82f6"></span>Calificaciones
+          </div>
+        </div>
+        <!-- main -->
+        <div style="flex:1;padding:24px 26px;background:#fbfaf7">
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px">
+            <div>
+              <div style="font-size:12px;font-weight:700;color:#8b8398;text-transform:uppercase;letter-spacing:1px">Buenas tardes, Sofía</div>
+              <div style="font-family:'Space Grotesk';font-size:24px;font-weight:700;letter-spacing:-.5px">Tu semestre de un vistazo</div>
+            </div>
+            <div style="font-size:12px;font-weight:700;color:#574f63;background:#fff;padding:8px 14px;border-radius:99px;border:1px solid rgba(25,21,39,.07)">Otoño 2026</div>
+          </div>
+          <!-- stat cards -->
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
+            <div style="background:#fff;border:1px solid rgba(25,21,39,.06);border-radius:14px;padding:14px">
+              <div style="font-size:11px;font-weight:700;color:#8b8398;margin-bottom:8px">Materias</div>
+              <div style="font-family:'Space Grotesk';font-size:26px;font-weight:700;color:#7c5cff;letter-spacing:-1px" class="cf-count" data-to="6" data-suffix="">0</div>
+            </div>
+            <div style="background:#fff;border:1px solid rgba(25,21,39,.06);border-radius:14px;padding:14px">
+              <div style="font-size:11px;font-weight:700;color:#8b8398;margin-bottom:8px">Pendientes</div>
+              <div style="font-family:'Space Grotesk';font-size:26px;font-weight:700;color:#ff6b5e;letter-spacing:-1px" class="cf-count" data-to="3" data-suffix="">0</div>
+            </div>
+            <div style="background:#fff;border:1px solid rgba(25,21,39,.06);border-radius:14px;padding:14px">
+              <div style="font-size:11px;font-weight:700;color:#8b8398;margin-bottom:8px">Promedio</div>
+              <div style="font-family:'Space Grotesk';font-size:26px;font-weight:700;color:#1fb6a6;letter-spacing:-1px" class="cf-count" data-to="92" data-suffix="">0</div>
+            </div>
+            <div style="background:#fff;border:1px solid rgba(25,21,39,.06);border-radius:14px;padding:14px">
+              <div style="font-size:11px;font-weight:700;color:#8b8398;margin-bottom:8px">Créditos</div>
+              <div style="font-family:'Space Grotesk';font-size:26px;font-weight:700;color:#3b82f6;letter-spacing:-1px" class="cf-count" data-to="24" data-suffix="">0</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:12px">
+            <!-- próxima entrega + tareas -->
+            <div style="background:#fff;border:1px solid rgba(25,21,39,.06);border-radius:14px;padding:16px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:13px">
+                <span style="font-weight:800;font-size:13px">Próximas tareas</span>
+                <span style="font-size:11px;font-weight:700;color:#ff6b5e;background:rgba(255,107,94,.12);padding:4px 9px;border-radius:99px">3 pendientes</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid rgba(25,21,39,.05)">
+                <span style="width:10px;height:10px;border-radius:3px;background:#ff6b5e;flex-shrink:0"></span>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Ensayo: Revolución Industrial</div>
+                  <div style="font-size:11px;color:#8b8398;font-weight:600">Historia</div>
+                </div>
+                <span style="font-size:11px;font-weight:700;color:#ff6b5e;white-space:nowrap">Mañana</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid rgba(25,21,39,.05)">
+                <span style="width:10px;height:10px;border-radius:3px;background:#1fb6a6;flex-shrink:0"></span>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Práctica de laboratorio 4</div>
+                  <div style="font-size:11px;color:#8b8398;font-weight:600">Química</div>
+                </div>
+                <span style="font-size:11px;font-weight:700;color:#574f63;white-space:nowrap">Vie</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid rgba(25,21,39,.05)">
+                <span style="width:10px;height:10px;border-radius:3px;background:#7c5cff;flex-shrink:0"></span>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Problemas cap. 7</div>
+                  <div style="font-size:11px;color:#8b8398;font-weight:600">Cálculo</div>
+                </div>
+                <span style="font-size:11px;font-weight:700;color:#574f63;white-space:nowrap">Lun</span>
+              </div>
+            </div>
+            <!-- mini chart -->
+            <div style="background:#fff;border:1px solid rgba(25,21,39,.06);border-radius:14px;padding:16px">
+              <div style="font-weight:800;font-size:13px;margin-bottom:14px">Desempeño</div>
+              <div style="display:flex;align-items:flex-end;gap:9px;height:120px">
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;justify-content:flex-end;height:100%">
+                  <div class="cf-bar" style="width:100%;border-radius:6px 6px 0 0;background:#7c5cff;height:70%"></div>
+                  <span style="font-size:10px;font-weight:700;color:#8b8398">Mat</span>
+                </div>
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;justify-content:flex-end;height:100%">
+                  <div class="cf-bar" style="width:100%;border-radius:6px 6px 0 0;background:#ff6b5e;height:52%"></div>
+                  <span style="font-size:10px;font-weight:700;color:#8b8398">His</span>
+                </div>
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;justify-content:flex-end;height:100%">
+                  <div class="cf-bar" style="width:100%;border-radius:6px 6px 0 0;background:#1fb6a6;height:88%"></div>
+                  <span style="font-size:10px;font-weight:700;color:#8b8398">Quí</span>
+                </div>
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;justify-content:flex-end;height:100%">
+                  <div class="cf-bar" style="width:100%;border-radius:6px 6px 0 0;background:#ffb020;height:64%"></div>
+                  <span style="font-size:10px;font-weight:700;color:#8b8398">Fís</span>
+                </div>
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;justify-content:flex-end;height:100%">
+                  <div class="cf-bar" style="width:100%;border-radius:6px 6px 0 0;background:#3b82f6;height:95%"></div>
+                  <span style="font-size:10px;font-weight:700;color:#8b8398">Cál</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- MARQUEE -->
+<div style="margin:40px 0 30px;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)">
+  <div style="display:flex;gap:16px;width:max-content;animation:cf-marq 26s linear infinite">
+    <div class="cf-chip" style="display:flex;align-items:center;gap:9px;padding:11px 19px;border-radius:99px;background:#fff;border:1px solid rgba(25,21,39,.07);box-shadow:0 4px 14px rgba(25,21,39,.04);font-weight:700;font-size:14px;white-space:nowrap"><span style="width:11px;height:11px;border-radius:4px;background:#7c5cff"></span>Cálculo II</div>
+    <div class="cf-chip" style="display:flex;align-items:center;gap:9px;padding:11px 19px;border-radius:99px;background:#fff;border:1px solid rgba(25,21,39,.07);box-shadow:0 4px 14px rgba(25,21,39,.04);font-weight:700;font-size:14px;white-space:nowrap"><span style="width:11px;height:11px;border-radius:4px;background:#ff6b5e"></span>Historia</div>
+    <div class="cf-chip" style="display:flex;align-items:center;gap:9px;padding:11px 19px;border-radius:99px;background:#fff;border:1px solid rgba(25,21,39,.07);box-shadow:0 4px 14px rgba(25,21,39,.04);font-weight:700;font-size:14px;white-space:nowrap"><span style="width:11px;height:11px;border-radius:4px;background:#1fb6a6"></span>Química Orgánica</div>
+    <div class="cf-chip" style="display:flex;align-items:center;gap:9px;padding:11px 19px;border-radius:99px;background:#fff;border:1px solid rgba(25,21,39,.07);box-shadow:0 4px 14px rgba(25,21,39,.04);font-weight:700;font-size:14px;white-space:nowrap"><span style="width:11px;height:11px;border-radius:4px;background:#ffb020"></span>Física</div>
+    <div class="cf-chip" style="display:flex;align-items:center;gap:9px;padding:11px 19px;border-radius:99px;background:#fff;border:1px solid rgba(25,21,39,.07);box-shadow:0 4px 14px rgba(25,21,39,.04);font-weight:700;font-size:14px;white-space:nowrap"><span style="width:11px;height:11px;border-radius:4px;background:#3b82f6"></span>Programación</div>
+    <div class="cf-chip" style="display:flex;align-items:center;gap:9px;padding:11px 19px;border-radius:99px;background:#fff;border:1px solid rgba(25,21,39,.07);box-shadow:0 4px 14px rgba(25,21,39,.04);font-weight:700;font-size:14px;white-space:nowrap"><span style="width:11px;height:11px;border-radius:4px;background:#ff5fa2"></span>Literatura</div>
+    <div class="cf-chip" style="display:flex;align-items:center;gap:9px;padding:11px 19px;border-radius:99px;background:#fff;border:1px solid rgba(25,21,39,.07);box-shadow:0 4px 14px rgba(25,21,39,.04);font-weight:700;font-size:14px;white-space:nowrap"><span style="width:11px;height:11px;border-radius:4px;background:#7c5cff"></span>Estadística</div>
+    <div class="cf-chip" style="display:flex;align-items:center;gap:9px;padding:11px 19px;border-radius:99px;background:#fff;border:1px solid rgba(25,21,39,.07);box-shadow:0 4px 14px rgba(25,21,39,.04);font-weight:700;font-size:14px;white-space:nowrap"><span style="width:11px;height:11px;border-radius:4px;background:#7c5cff"></span>Cálculo II</div>
+    <div class="cf-chip" style="display:flex;align-items:center;gap:9px;padding:11px 19px;border-radius:99px;background:#fff;border:1px solid rgba(25,21,39,.07);box-shadow:0 4px 14px rgba(25,21,39,.04);font-weight:700;font-size:14px;white-space:nowrap"><span style="width:11px;height:11px;border-radius:4px;background:#ff6b5e"></span>Historia</div>
+    <div class="cf-chip" style="display:flex;align-items:center;gap:9px;padding:11px 19px;border-radius:99px;background:#fff;border:1px solid rgba(25,21,39,.07);box-shadow:0 4px 14px rgba(25,21,39,.04);font-weight:700;font-size:14px;white-space:nowrap"><span style="width:11px;height:11px;border-radius:4px;background:#1fb6a6"></span>Química Orgánica</div>
+    <div class="cf-chip" style="display:flex;align-items:center;gap:9px;padding:11px 19px;border-radius:99px;background:#fff;border:1px solid rgba(25,21,39,.07);box-shadow:0 4px 14px rgba(25,21,39,.04);font-weight:700;font-size:14px;white-space:nowrap"><span style="width:11px;height:11px;border-radius:4px;background:#ffb020"></span>Física</div>
+    <div class="cf-chip" style="display:flex;align-items:center;gap:9px;padding:11px 19px;border-radius:99px;background:#fff;border:1px solid rgba(25,21,39,.07);box-shadow:0 4px 14px rgba(25,21,39,.04);font-weight:700;font-size:14px;white-space:nowrap"><span style="width:11px;height:11px;border-radius:4px;background:#3b82f6"></span>Programación</div>
+    <div class="cf-chip" style="display:flex;align-items:center;gap:9px;padding:11px 19px;border-radius:99px;background:#fff;border:1px solid rgba(25,21,39,.07);box-shadow:0 4px 14px rgba(25,21,39,.04);font-weight:700;font-size:14px;white-space:nowrap"><span style="width:11px;height:11px;border-radius:4px;background:#ff5fa2"></span>Literatura</div>
+    <div class="cf-chip" style="display:flex;align-items:center;gap:9px;padding:11px 19px;border-radius:99px;background:#fff;border:1px solid rgba(25,21,39,.07);box-shadow:0 4px 14px rgba(25,21,39,.04);font-weight:700;font-size:14px;white-space:nowrap"><span style="width:11px;height:11px;border-radius:4px;background:#7c5cff"></span>Estadística</div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features" style="max-width:1240px;margin:0 auto;padding:80px 40px">
+  <div class="cf-rev" style="text-align:center;margin-bottom:54px">
+    <div style="font-size:14px;font-weight:800;color:#7c5cff;text-transform:uppercase;letter-spacing:2px;margin-bottom:14px">Todo lo que necesitas</div>
+    <h2 style="font-family:'Space Grotesk';font-size:50px;font-weight:700;letter-spacing:-1.5px;margin:0;line-height:1.05">Siete herramientas.<br>Cero caos.</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px">
+    <div class="cf-rev cf-feat" style="grid-column:span 1;background:#fff;border:1px solid rgba(25,21,39,.07);border-radius:22px;padding:30px;box-shadow:0 10px 30px rgba(25,21,39,.04);position:relative;overflow:hidden">
+      <div style="position:absolute;top:-40px;right:-40px;width:130px;height:130px;border-radius:50%;background:#7c5cff;filter:blur(28px);opacity:.5"></div>
+      <div style="position:relative">
+        <div style="width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,#7c5cff,#3b82f6);display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 8px 20px rgba(124,92,255,.4)">
+          <span style="color:#fff;font-family:'Space Grotesk';font-weight:700;font-size:20px">◧</span>
+        </div>
+        <h3 style="font-family:'Space Grotesk';font-size:23px;font-weight:700;margin:0 0 10px;letter-spacing:-.5px">Dashboard</h3>
+        <p style="font-size:15px;line-height:1.6;color:#574f63;margin:0;font-weight:500">Un resumen instantáneo: materias activas, tareas pendientes, promedio general y tu próxima entrega y examen.</p>
+      </div>
+    </div>
+    <div class="cf-rev cf-feat" style="grid-column:span 1;background:#fff;border:1px solid rgba(25,21,39,.07);border-radius:22px;padding:30px;box-shadow:0 10px 30px rgba(25,21,39,.04);position:relative;overflow:hidden">
+      <div style="position:absolute;top:-40px;right:-40px;width:130px;height:130px;border-radius:50%;background:#ff6b5e;filter:blur(28px);opacity:.5"></div>
+      <div style="position:relative">
+        <div style="width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,#ff6b5e,#ffb020);display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 8px 20px rgba(255,107,94,.4)">
+          <span style="color:#fff;font-family:'Space Grotesk';font-weight:700;font-size:20px">◑</span>
+        </div>
+        <h3 style="font-family:'Space Grotesk';font-size:23px;font-weight:700;margin:0 0 10px;letter-spacing:-.5px">Materias</h3>
+        <p style="font-size:15px;line-height:1.6;color:#574f63;margin:0;font-weight:500">Registra clases con profesor, salón, créditos y un código de color para identificarlas al instante.</p>
+      </div>
+    </div>
+    <div class="cf-rev cf-feat" style="grid-column:span 1;background:#fff;border:1px solid rgba(25,21,39,.07);border-radius:22px;padding:30px;box-shadow:0 10px 30px rgba(25,21,39,.04);position:relative;overflow:hidden">
+      <div style="position:absolute;top:-40px;right:-40px;width:130px;height:130px;border-radius:50%;background:#ffb020;filter:blur(28px);opacity:.5"></div>
+      <div style="position:relative">
+        <div style="width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,#ffb020,#ff6b5e);display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 8px 20px rgba(255,176,32,.4)">
+          <span style="color:#fff;font-family:'Space Grotesk';font-weight:700;font-size:20px">✓</span>
+        </div>
+        <h3 style="font-family:'Space Grotesk';font-size:23px;font-weight:700;margin:0 0 10px;letter-spacing:-.5px">Tareas</h3>
+        <p style="font-size:15px;line-height:1.6;color:#574f63;margin:0;font-weight:500">Gestión completa con fecha límite, prioridad y estado. Filtra por materia o por estado en un clic.</p>
+      </div>
+    </div>
+    <div class="cf-rev cf-feat" style="grid-column:span 1;background:#fff;border:1px solid rgba(25,21,39,.07);border-radius:22px;padding:30px;box-shadow:0 10px 30px rgba(25,21,39,.04);position:relative;overflow:hidden">
+      <div style="position:absolute;top:-40px;right:-40px;width:130px;height:130px;border-radius:50%;background:#1fb6a6;filter:blur(28px);opacity:.5"></div>
+      <div style="position:relative">
+        <div style="width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,#1fb6a6,#3b82f6);display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 8px 20px rgba(31,182,166,.4)">
+          <span style="color:#fff;font-family:'Space Grotesk';font-weight:700;font-size:20px">▦</span>
+        </div>
+        <h3 style="font-family:'Space Grotesk';font-size:23px;font-weight:700;margin:0 0 10px;letter-spacing:-.5px">Horario</h3>
+        <p style="font-size:15px;line-height:1.6;color:#574f63;margin:0;font-weight:500">Cuadrícula semanal interactiva para tus bloques de clase. Detecta automáticamente los solapamientos.</p>
+      </div>
+    </div>
+    <div class="cf-rev cf-feat" style="grid-column:span 2;background:#fff;border:1px solid rgba(25,21,39,.07);border-radius:22px;padding:30px;box-shadow:0 10px 30px rgba(25,21,39,.04);position:relative;overflow:hidden">
+      <div style="position:absolute;top:-40px;right:-40px;width:130px;height:130px;border-radius:50%;background:#3b82f6;filter:blur(28px);opacity:.5"></div>
+      <div style="position:relative">
+        <div style="width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,#3b82f6,#7c5cff);display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 8px 20px rgba(59,130,246,.4)">
+          <span style="color:#fff;font-family:'Space Grotesk';font-weight:700;font-size:20px">◔</span>
+        </div>
+        <h3 style="font-family:'Space Grotesk';font-size:23px;font-weight:700;margin:0 0 10px;letter-spacing:-.5px">Calificaciones</h3>
+        <p style="font-size:15px;line-height:1.6;color:#574f63;margin:0;font-weight:500">Captura notas por materia —parciales, proyecto y examen— con cálculo automático del promedio y gráficas de desempeño.</p>
+      </div>
+    </div>
+    <div class="cf-rev cf-feat" style="grid-column:span 1;background:#fff;border:1px solid rgba(25,21,39,.07);border-radius:22px;padding:30px;box-shadow:0 10px 30px rgba(25,21,39,.04);position:relative;overflow:hidden">
+      <div style="position:absolute;top:-40px;right:-40px;width:130px;height:130px;border-radius:50%;background:#ff5fa2;filter:blur(28px);opacity:.5"></div>
+      <div style="position:relative">
+        <div style="width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,#ff5fa2,#7c5cff);display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 8px 20px rgba(255,95,162,.4)">
+          <span style="color:#fff;font-family:'Space Grotesk';font-weight:700;font-size:20px">✎</span>
+        </div>
+        <h3 style="font-family:'Space Grotesk';font-size:23px;font-weight:700;margin:0 0 10px;letter-spacing:-.5px">Notas</h3>
+        <p style="font-size:15px;line-height:1.6;color:#574f63;margin:0;font-weight:500">Editor de apuntes con corrección ortográfica y gramatical asistida por IA. Escribe, corrige y organiza sin salir de la app.</p>
+      </div>
+    </div>
+    <div class="cf-rev cf-feat" style="grid-column:span 2;background:#fff;border:1px solid rgba(25,21,39,.07);border-radius:22px;padding:30px;box-shadow:0 10px 30px rgba(25,21,39,.04);position:relative;overflow:hidden">
+      <div style="position:absolute;top:-40px;right:-40px;width:130px;height:130px;border-radius:50%;background:#1fb6a6;filter:blur(28px);opacity:.5"></div>
+      <div style="position:relative">
+        <div style="width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,#1fb6a6,#7c5cff);display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 8px 20px rgba(31,182,166,.4)">
+          <span style="color:#fff;font-family:'Space Grotesk';font-weight:700;font-size:20px">✦</span>
+        </div>
+        <h3 style="font-family:'Space Grotesk';font-size:23px;font-weight:700;margin:0 0 10px;letter-spacing:-.5px">Asistente IA</h3>
+        <p style="font-size:15px;line-height:1.6;color:#574f63;margin:0;font-weight:500">Un tutor con IA integrado (Groq): explica temas, resume y te ayuda a estudiar y a preparar exámenes, sin salir de CampusFlow.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" style="background:#191527;color:#fff;padding:90px 40px;position:relative;overflow:hidden">
+  <div style="max-width:1180px;margin:0 auto;position:relative">
+    <div class="cf-rev" style="text-align:center;margin-bottom:58px">
+      <div style="font-size:14px;font-weight:800;color:#ffb020;text-transform:uppercase;letter-spacing:2px;margin-bottom:14px">Empieza en minutos</div>
+      <h2 style="font-family:'Space Grotesk';font-size:50px;font-weight:700;letter-spacing:-1.5px;margin:0">Cómo funciona</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
+      <div class="cf-rev cf-step" style="text-align:center">
+        <div class="cf-stepnum" style="width:74px;height:74px;border-radius:22px;background:linear-gradient(135deg,#7c5cff,#3b82f6);display:flex;align-items:center;justify-content:center;margin:0 auto 22px;font-family:'Space Grotesk';font-weight:700;font-size:30px;box-shadow:0 16px 40px rgba(124,92,255,.45)">1</div>
+        <h3 style="font-family:'Space Grotesk';font-size:22px;font-weight:700;margin:0 0 11px">Carga tus materias</h3>
+        <p style="font-size:15px;line-height:1.6;color:#a39bb3;margin:0;font-weight:500;max-width:300px;margin:0 auto">Añade tus clases con su color, profesor y horario en menos de cinco minutos.</p>
+      </div>
+      <div class="cf-rev cf-step" style="text-align:center">
+        <div class="cf-stepnum" style="width:74px;height:74px;border-radius:22px;background:linear-gradient(135deg,#ff6b5e,#ffb020);display:flex;align-items:center;justify-content:center;margin:0 auto 22px;font-family:'Space Grotesk';font-weight:700;font-size:30px;box-shadow:0 16px 40px rgba(255,107,94,.45)">2</div>
+        <h3 style="font-family:'Space Grotesk';font-size:22px;font-weight:700;margin:0 0 11px">Organiza tus tareas</h3>
+        <p style="font-size:15px;line-height:1.6;color:#a39bb3;margin:0;font-weight:500;max-width:300px;margin:0 auto">Registra entregas y exámenes con prioridad y fecha límite. CampusFlow las ordena por ti.</p>
+      </div>
+      <div class="cf-rev cf-step" style="text-align:center">
+        <div class="cf-stepnum" style="width:74px;height:74px;border-radius:22px;background:linear-gradient(135deg,#1fb6a6,#3b82f6);display:flex;align-items:center;justify-content:center;margin:0 auto 22px;font-family:'Space Grotesk';font-weight:700;font-size:30px;box-shadow:0 16px 40px rgba(31,182,166,.45)">3</div>
+        <h3 style="font-family:'Space Grotesk';font-size:22px;font-weight:700;margin:0 0 11px">Sigue tu progreso</h3>
+        <p style="font-size:15px;line-height:1.6;color:#a39bb3;margin:0;font-weight:500;max-width:300px;margin:0 auto">Captura calificaciones y observa tu promedio y desempeño actualizarse en tiempo real.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="download" style="max-width:1100px;margin:0 auto;padding:100px 40px">
+  <div class="cf-rev" style="position:relative;border-radius:32px;overflow:hidden;background:linear-gradient(135deg,#7c5cff,#3b82f6 55%,#1fb6a6);padding:72px 48px;text-align:center;color:#fff;box-shadow:0 40px 90px -24px rgba(124,92,255,.55)">
+    <div style="position:absolute;top:-80px;left:-60px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,.14);filter:blur(10px)"></div>
+    <div style="position:absolute;bottom:-100px;right:-40px;width:280px;height:280px;border-radius:50%;background:rgba(255,176,32,.3);filter:blur(20px)"></div>
+    <div style="position:relative">
+      <h2 style="font-family:'Space Grotesk';font-size:52px;font-weight:700;letter-spacing:-1.5px;margin:0 0 18px;line-height:1.05">Tu mejor semestre<br>empieza hoy.</h2>
+      <p style="font-size:19px;font-weight:600;opacity:.92;margin:0 auto 34px;max-width:520px">Gratis para estudiantes. Disponible para Mac con Apple Silicon · Windows próximamente.</p>
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+        <a id="cf-dl-mac" href="#download" class="cf-btn" aria-label="Descargar CampusFlow para macOS" style="text-decoration:none;color:#191527;background:#fff;padding:16px 30px;border-radius:14px;font-weight:800;font-size:16px;box-shadow:0 16px 36px rgba(0,0,0,.22)">Descargar para macOS</a>
+        <span class="cf-soon" aria-disabled="true" style="color:rgba(255,255,255,.75);background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.25);padding:16px 30px;border-radius:14px;font-weight:800;font-size:16px;cursor:not-allowed;user-select:none">Windows — Próximamente</span>
+      </div>
+      <p id="cf-dl-note" role="status" aria-live="polite" style="margin:18px 0 0;font-size:14px;font-weight:600;opacity:.9;min-height:20px"></p>
+      <p style="margin:12px auto 0;font-size:14px;font-weight:600;opacity:.92;max-width:560px">Versión 1.0.0 (beta) · macOS 11 o superior · Mac con chip Apple (M1 o posterior). Aún no hay versión para Mac con Intel.</p>
+      <details style="max-width:560px;margin:16px auto 0;text-align:left;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);border-radius:16px;padding:14px 20px;font-size:14px;line-height:1.6;font-weight:500">
+        <summary style="cursor:pointer;font-weight:700">¿Te sale un aviso de seguridad al abrirla?</summary>
+        <p style="margin:10px 0 6px">CampusFlow está en beta y todavía no está firmada por Apple, así que macOS te pedirá confirmación la primera vez.</p>
+        <p style="margin:6px 0 0">Abre el <em>.dmg</em>, arrastra CampusFlow a Aplicaciones, y luego haz clic derecho sobre la app → <em>Abrir</em> → <em>Abrir</em>. Si no aparece esa opción, ve a Ajustes del Sistema → Privacidad y seguridad → <em>Abrir de todos modos</em>.</p>
+      </details>
+      <p style="margin:18px auto 0;font-size:13px;opacity:.85;max-width:560px;line-height:1.6">Tus datos se guardan solo en tu Mac. El asistente de IA es opcional y usa tu propia clave de Groq. <a href="privacidad.html" style="color:inherit">Política de privacidad</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer style="border-top:1px solid rgba(25,21,39,.08);padding:40px;max-width:1240px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#7c5cff,#3b82f6)"></div>
+    <span style="font-family:'Space Grotesk';font-weight:700;font-size:17px">CampusFlow</span>
+  </div>
+  <div style="font-size:14px;color:#8b8398;font-weight:600">Hecho para estudiantes · <a href="privacidad.html" style="color:inherit">Privacidad</a> · © 2026 CampusFlow</div>
+</footer>
+
+</main>
+<script>
+(function () {
+  // === Descarga ===
+  // Pega aquí el enlace del .dmg (GitHub Release, servidor propio, CDN, etc.).
+  // Mientras esté vacío, el botón NO navega y muestra un aviso en la página.
+  var DMG_URL = "https://github.com/chemaitas-boop/campusflow-app/releases/latest/download/CampusFlow-mac-arm64.dmg";
+
+  var macBtn = document.getElementById('cf-dl-mac');
+  var dlNote = document.getElementById('cf-dl-note');
+  if (macBtn) {
+    if (DMG_URL) {
+      macBtn.setAttribute('href', DMG_URL);
+      macBtn.setAttribute('download', '');
+    } else {
+      macBtn.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        if (dlNote) dlNote.textContent = 'La descarga estará disponible muy pronto. ¡Gracias por tu interés! 🙌';
+      });
+    }
+  }
+
+  // reveal on scroll
+  var revs = document.querySelectorAll('.cf-rev');
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        var sibs = Array.prototype.slice.call(e.target.parentElement.querySelectorAll('.cf-rev'));
+        var idx = sibs.indexOf(e.target);
+        e.target.style.transitionDelay = (Math.max(0, idx) * 70) + 'ms';
+        e.target.classList.add('cf-in');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  revs.forEach(function (r) { io.observe(r); });
+
+  // counters
+  var counters = document.querySelectorAll('.cf-count');
+  var co = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      var el = e.target;
+      var to = parseFloat(el.dataset.to) || 0;
+      var suffix = el.dataset.suffix || '';
+      var start = performance.now();
+      var dur = 1100;
+      function tick(now) {
+        var p = Math.min(1, (now - start) / dur);
+        var ease = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(to * ease) + suffix;
+        if (p < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+      co.unobserve(el);
+    });
+  }, { threshold: 0.4 });
+  counters.forEach(function (c) { co.observe(c); });
+
+  // cursor: blob + window tilt
+  var blob = document.querySelector('#cf-blob');
+  var win = document.querySelector('#cf-win');
+  window.addEventListener('mousemove', function (ev) {
+    var w = window.innerWidth, h = window.innerHeight;
+    var dx = (ev.clientX / w - 0.5);
+    var dy = (ev.clientY / h - 0.5);
+    if (blob) blob.style.transform = 'translate(calc(-50% + ' + (dx * 40) + 'px), ' + (dy * 30) + 'px)';
+    if (win) win.style.transform = 'rotateX(' + (-dy * 4) + 'deg) rotateY(' + (dx * 5) + 'deg)';
+  }, { passive: true });
+})();
+</script>
+</body>
+</html>
