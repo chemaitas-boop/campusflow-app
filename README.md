@@ -6,11 +6,11 @@ Asistente académico de escritorio para estudiantes: materias, tareas, horario, 
 
 ## Descarga
 
-Última versión: **[CampusFlow-mac-arm64.dmg](https://github.com/chemaitas-boop/campusflow-app/releases/latest/download/CampusFlow-mac-arm64.dmg)** (beta 1.0.3)
+Última versión: **[CampusFlow-mac-arm64.dmg](https://github.com/chemaitas-boop/campusflow-app/releases/latest/download/CampusFlow-mac-arm64.dmg)** (beta 1.0.4)
 
 - macOS 11 o superior, Mac con chip Apple (M1 o posterior). No hay versión para Mac con Intel.
 - La app aún no está firmada por Apple: la primera vez, clic derecho sobre CampusFlow → *Abrir* → *Abrir*.
-- Verificación opcional: `shasum -a 256 CampusFlow-mac-arm64.dmg` debe dar `ebcfbc8d08670c3a2acc06d7cc127297efc5a1a9e7ae1c2dc535813033a47422`.
+- Verificación opcional: `shasum -a 256 CampusFlow-mac-arm64.dmg` debe dar `b4db58a64375233a51a8112c73d91635e25f98c8acd7998e674a8a1d6ce7bd0a`.
 
 ## Privacidad
 
