@@ -41,10 +41,10 @@
 
 <main>
   <h1>Política de privacidad</h1>
-  <p class="meta">Última actualización: 10 de octubre de 2026 · Aplica a CampusFlow 1.0 para macOS y a este sitio web</p>
+  <p class="meta">Última actualización: 11 de octubre de 2026 · Aplica a CampusFlow 1.0 para macOS y a este sitio web</p>
 
   <div class="box">
-    <p><strong>En pocas palabras:</strong> CampusFlow guarda tus datos académicos únicamente en tu Mac. No tiene cuentas, no tiene publicidad ni analíticas, y no recibimos tu información. La única vez que algo sale de tu computadora es cuando <em>tú</em> usas el asistente de IA o la corrección de notas, que envían texto a Groq con tu propia clave.</p>
+    <p><strong>En pocas palabras:</strong> CampusFlow guarda tus datos académicos únicamente en tu Mac. No tiene cuentas, no tiene publicidad ni analíticas, y no recibimos tu información. La única vez que algo sale de tu computadora es cuando <em>tú</em> usas el asistente de IA o la corrección de notas, que envían texto a Google (Gemini) con tu propia clave.</p>
   </div>
 
   <h2>1. Qué datos guarda la app en tu Mac</h2>
@@ -52,20 +52,30 @@
   <p><code>~/Library/Application Support/CampusFlow</code></p>
   <ul>
     <li><strong>Respaldos:</strong> la app crea un respaldo automático al día (conserva los 10 más recientes) y puedes crear otros manualmente. Se guardan en la subcarpeta <code>backups</code> y contienen tus mismos datos.</li>
-    <li><strong>Tu clave de Groq</strong>, si decides usar la IA, se guarda en el Llavero de macOS, no en la base de datos ni en los respaldos.</li>
+    <li><strong>Tu clave de Google</strong>, si decides usar la IA, se guarda en el Llavero de macOS, no en la base de datos ni en los respaldos.</li>
     <li>Las notificaciones de tareas y clases las genera tu propio Mac; no pasan por ningún servidor.</li>
   </ul>
   <p>Nosotros no tenemos acceso a esta información: nunca sale de tu computadora a menos que tú la copies o compartas.</p>
 
   <h2>2. Asistente de IA y corrección de notas (opcional)</h2>
-  <p>Estas dos funciones solo se activan si pegas tu propia clave de la API de <a href="https://groq.com" rel="noopener">Groq</a> en Configuración. Si no lo haces, no se envía nada a ningún servicio.</p>
-  <p>Cuando las usas, la app envía directamente desde tu Mac a Groq, usando tu clave:</p>
+  <p>Estas dos funciones usan Google Gemini y solo se activan si pegas tu propia clave de <a href="https://aistudio.google.com/apikey" rel="noopener">Google AI Studio</a> en Configuración. Si no lo haces, no se envía nada a ningún servicio.</p>
+  <p>Cuando las usas, la app envía directamente desde tu Mac a Google, usando tu clave:</p>
   <ul>
     <li><strong>Asistente (chat):</strong> las instrucciones fijas del asistente y los últimos mensajes de la conversación en curso (hasta 20). El historial del chat vive solo en memoria y se pierde al cerrar la app.</li>
     <li><strong>Corrección gramatical:</strong> el texto de la nota que pides corregir.</li>
   </ul>
-  <p>No se envían tus materias, tareas, calificaciones, horario, nombre ni el resto de tus notas, salvo que tú lo escribas en el chat o en la nota que corriges. <strong>Evita escribir información sensible</strong> (contraseñas, datos de identidad, información médica) en estas funciones.</p>
-  <p>Groq es un tercero independiente: el tratamiento que da al texto que recibe (incluido cuánto tiempo lo conserva) lo rigen sus propias condiciones, no esta política. Consulta su <a href="https://groq.com/privacy-policy" rel="noopener">política de privacidad</a> y los términos de tu cuenta de Groq antes de usar la IA. La clave es tuya y la cuenta de Groq también; nosotros no la vemos.</p>
+  <p>No se envían tus materias, tareas, calificaciones, horario, nombre ni el resto de tus notas, salvo que tú lo escribas en el chat o en la nota que corriges.</p>
+  <div class="box">
+    <p><strong>Importante sobre Google y tu privacidad:</strong></p>
+    <ul>
+      <li><strong>Debes ser mayor de 18 años.</strong> Es un requisito de las condiciones de la API de Google; la clave y la cuenta son tuyas.</li>
+      <li>Con la <strong>capa gratuita</strong>, Google indica que usa el contenido enviado para proporcionar, mejorar y desarrollar sus productos, y que <strong>personas pueden leerlo y revisarlo</strong> (antes lo desvinculan de tu cuenta de Google y de tu clave). Google recomienda no enviar información personal, confidencial ni sensible.</li>
+      <li>Con una cuenta de <strong>pago</strong>, Google indica que el contenido no se usa para mejorar sus productos.</li>
+      <li>En el Espacio Económico Europeo, el Reino Unido y Suiza, Google aplica a la capa gratuita las condiciones de datos de los servicios de pago.</li>
+    </ul>
+    <p>Por eso: <strong>no escribas contraseñas, datos de identidad, información médica ni datos de otras personas</strong> en estas funciones.</p>
+  </div>
+  <p>Google es un tercero independiente: lo que hace con el texto que recibe lo rigen sus propias condiciones, no esta política. Consúltalas antes de usar la IA: <a href="https://ai.google.dev/gemini-api/terms" rel="noopener">condiciones de la API de Gemini</a>.</p>
 
   <h2>3. Qué no hacemos</h2>
   <ul>
@@ -85,9 +95,9 @@
   <h2>5. Cómo borrar tus datos</h2>
   <p>Como los datos están en tu Mac, tú los controlas por completo:</p>
   <ul>
-    <li><strong>Borrar la clave de Groq:</strong> vacía el campo en Configuración, o elimina el elemento «CampusFlow» en la app Acceso a Llaveros.</li>
+    <li><strong>Borrar la clave de Google:</strong> vacía el campo en Configuración, o elimina el elemento «CampusFlow» en la app Acceso a Llaveros.</li>
     <li><strong>Borrar todo lo demás:</strong> elimina la carpeta <code>~/Library/Application Support/CampusFlow</code> (incluye la base de datos y los respaldos) y arrastra CampusFlow a la Papelera.</li>
-    <li><strong>Datos enviados a Groq:</strong> para consultarlos o pedir su eliminación, dirígete a Groq con tu cuenta.</li>
+    <li><strong>Datos enviados a Google:</strong> para consultarlos o pedir su eliminación, dirígete a Google con tu cuenta.</li>
   </ul>
 
   <h2>6. Cambios a esta política</h2>
