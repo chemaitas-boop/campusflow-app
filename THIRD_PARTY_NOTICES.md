@@ -36,6 +36,7 @@ correspondiente (PyPI) o en el sitio de su proyecto.
 | pyobjc-core | 12.2.1 | MIT |
 | pyobjc-framework-Cocoa | 12.2.1 | MIT |
 | pyobjc-framework-UserNotifications | 12.2.1 | MIT |
+| reportlab | 5.1.0 | BSD License |
 | requests | 2.34.2 | Apache Software License |
 | sniffio | 1.3.1 | MIT License; Apache Software License |
 | tenacity | 9.1.4 | Apache Software License |
