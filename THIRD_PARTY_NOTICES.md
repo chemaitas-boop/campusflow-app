@@ -8,7 +8,7 @@ correspondiente (PyPI) o en el sitio de su proyecto.
 |---|---|---|
 | annotated-types | 0.7.0 | MIT License |
 | anyio | 4.15.1 | MIT |
-| certifi | 2026.6.17 | Mozilla Public License 2.0 (MPL 2.0) |
+| certifi | 2026.10.23 | Mozilla Public License 2.0 (MPL 2.0) |
 | cffi | 2.0.0 | MIT |
 | charset-normalizer | 3.4.7 | MIT |
 | cryptography | 50.0.2 | Apache-2.0 OR BSD-3-Clause |
@@ -27,7 +27,7 @@ correspondiente (PyPI) o en el sitio de su proyecto.
 | keyring | 25.7.0 | MIT |
 | more-itertools | 11.1.0 | MIT |
 | packaging | 26.2 | Apache-2.0 OR BSD-2-Clause |
-| pillow | 12.3.0 | MIT-CMU |
+| pillow | 13.0.0 | MIT-CMU |
 | pyasn1 | 0.6.4 | BSD-2-Clause |
 | pyasn1_modules | 0.4.2 | BSD License |
 | pycparser | 3.0 | BSD-3-Clause |
